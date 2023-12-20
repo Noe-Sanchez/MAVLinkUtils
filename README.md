@@ -1,5 +1,13 @@
 # MAVLinkUtils
 
+## Requirements
+
+* python3
+* pip
+* gcc
+
+## Build
+
 ### Fetch dependencies
 
 ```bash
