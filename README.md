@@ -14,17 +14,15 @@
 make dependencies
 ```
 
-### Build decoder and router
+### Build code 
 
 ```bash
 make decoder
-make router
 ```
 
 ### Run code
 
 ```bash
 ./bin/decoder
-./bin/router
 ```
 
