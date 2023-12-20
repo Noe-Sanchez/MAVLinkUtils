@@ -20,3 +20,11 @@ make dependencies
 make decoder
 make router
 ```
+
+### Run code
+
+```bash
+./bin/decoder
+./bin/router
+```
+
