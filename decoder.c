@@ -77,17 +77,20 @@ void print_message_name(mavlink_message_t msg, char *buf){
 }
 
 
-int main(){
+int main(int argc, char* argv[]){
 
-	mavlink_status_t status;
+  mavlink_status_t status;
   mavlink_message_t msg;
   int chan = MAVLINK_COMM_0;
+  int port;
+  sscanf(argv[1], "%d", &port);
+  printf("Decoding from port %d \r\n", port);
 
   // Parse message comming from udp socket
   int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(14550);
+  addr.sin_port = htons(port);
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
   // Bind socket
@@ -111,11 +114,43 @@ int main(){
             mavlink_heartbeat_t hb;
             mavlink_msg_heartbeat_decode(&msg, &hb);
             printf("Heartbeat: %d, %d, %d, %d, %d, %d\n", hb.type, hb.autopilot, hb.base_mode, hb.custom_mode, hb.system_status, hb.mavlink_version);
-          }*/
+          }*/ 
+
           // Print message name
           char msg_name[30];
           print_message_name(msg, msg_name);
-          printf("Received packet: %s\n", msg_name);
+          //printf("Received packet: %s\n", msg_name);
+
+          // If message is a heartbeat, decode it and print it strictly in binary string format (1s and 0s)
+          if(msg.msgid == MAVLINK_MSG_ID_HEARTBEAT){  
+            mavlink_heartbeat_t hb;
+            mavlink_msg_heartbeat_decode(&msg, &hb);
+            printf("Heartbeat: ");
+            for(int i = 0; i < 8; i++){
+              printf("%d", (hb.type >> i) & 1);
+            }
+            printf(" ");
+            for(int i = 0; i < 8; i++){
+              printf("%d", (hb.autopilot >> i) & 1);
+            }
+            printf(" ");
+            for(int i = 0; i < 8; i++){
+              printf("%d", (hb.base_mode >> i) & 1);
+            }
+            printf(" ");
+            for(int i = 0; i < 24; i++){
+              printf("%d", (hb.custom_mode >> i) & 1);
+            }
+            printf(" ");
+            for(int i = 0; i < 8; i++){
+              printf("%d", (hb.system_status >> i) & 1);
+            }
+            printf(" ");
+            for(int i = 0; i < 8; i++){
+              printf("%d", (hb.mavlink_version >> i) & 1);
+            }
+            printf("\n");
+          }
 
         }
       }
